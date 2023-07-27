@@ -47,10 +47,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Install Chocolatey
-      run: |
-        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-      shell: pwsh
 
     - name: Install rcedit using Chocolatey
       run: choco install rcedit -y
@@ -58,28 +54,33 @@ runs:
 
     - name: Set resources on files
       run: |
-        $dir = ${{ inputs.directory-path }}
-        $comment = ${{ inputs.comment }}
-        $flag = ${{ inputs.set-icon }}
-        $exeFile = ${{ inputs.exe-file-name }}
-        $icoFile = ${{ inputs.ico-file-path }}
-        $companyName = ${{ inputs.company-name }}
-        $fileDescription = ${{ inputs.file-description }}
-        $fileVersion = ${{ inputs.file-version }}
-        $legalCopyright = ${{ inputs.legal-copyright }}
-        $legalTrademarks = ${{ inputs.legal-trademarks }}
-        $productName = ${{ inputs.product-name }}
-        $productVersion = ${{ inputs.product-version }}
+        $dir = "${{ inputs.directory-path }}"
+        $comment = "${{ inputs.comment }}"
+        $flag = "${{ inputs.set-icon }}"
+        $specificFile = "${{ inputs.exe-file-name }}"
+        $icoFile = "${{ inputs.ico-file-path }}"
+        $companyName = "${{ inputs.company-name }}"
+        $fileDescription = "${{ inputs.file-description }}"
+        $fileVersion = "${{ inputs.file-version }}"
+        $legalCopyright = "${{ inputs.legal-copyright }}"
+        $legalTrademarks = "${{ inputs.legal-trademarks }}"
+        $productName = "${{ inputs.product-name }}"
+        $productVersion = "${{ inputs.product-version }}"
 
-        Get-ChildItem -Path $dir -Recurse -File | Where-Object { $_.Extension -eq ".exe" } | ForEach-Object {
-            if ($null -ne $comment) { rcedit $_.FullName --set-version-string "Comments" $comment }
-            if ($flag -eq "true" -and $_.Name -eq $exeFile) { rcedit $_.FullName --set-icon $icoFile }
-            if ($null -ne $companyName) { rcedit $_.FullName --set-version-string "CompanyName" $companyName }
-            if ($null -ne $fileDescription) { rcedit $_.FullName --set-version-string "FileDescription" $fileDescription }
-            if ($null -ne $fileVersion) { rcedit $_.FullName --set-version-string "FileVersion" $fileVersion }
-            if ($null -ne $legalCopyright) { rcedit $_.FullName --set-version-string "LegalCopyright" $legalCopyright }
-            if ($null -ne $legalTrademarks) { rcedit $_.FullName --set-version-string "LegalTrademarks" $legalTrademarks }
-            if ($null -ne $productName) { rcedit $_.FullName --set-version-string "ProductName" $productName }
-            if ($null -ne $productVersion) { rcedit $_.FullName --set-version-string "ProductVersion" $productVersion }
+        $targetFiles = Get-ChildItem -Path $dir -Recurse -File | Where-Object { $_.Extension -eq ".exe" -or $_.Extension -eq ".dll" }
+
+        foreach ($file in $targetFiles) {
+            if ($null -ne $comment) { & rcedit $file.FullName --set-version-string "Comments" "$comment" }
+            if ($null -ne $companyName) { & rcedit $file.FullName --set-version-string "CompanyName" "$companyName" }
+            if ($null -ne $legalCopyright) { & rcedit $file.FullName --set-version-string "LegalCopyright" "$legalCopyright" }
+            if ($null -ne $legalTrademarks) { & rcedit $file.FullName --set-version-string "LegalTrademarks" "$legalTrademarks" }
+
+            if ($file.Name -eq $specificFile) {
+                if ($flag -eq "true") { & rcedit $file.FullName --set-icon "$icoFile" }
+                if ($null -ne $fileDescription) { & rcedit $file.FullName --set-version-string "FileDescription" "$fileDescription" }
+                if ($null -ne $fileVersion) { & rcedit $file.FullName --set-version-string "FileVersion" "$fileVersion" }
+                if ($null -ne $productName) { & rcedit $file.FullName --set-version-string "ProductName" "$productName" }
+                if ($null -ne $productVersion) { & rcedit $file.FullName --set-version-string "ProductVersion" "$productVersion" }
+            }
         }
       shell: pwsh
