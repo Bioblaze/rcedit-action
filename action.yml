@@ -43,25 +43,21 @@ inputs:
   product-version:
     description: 'Product version to set on the exe files'
     required: false
-  
+
 runs:
   using: "composite"
   steps:
-
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
-
-    - name: Install rcedit
+    - name: Install Chocolatey
       run: |
-        npm install --global --production windows-build-tools
-        npm install -g rcedit
-      shell: bash
+        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+      shell: pwsh
+
+    - name: Install rcedit using Chocolatey
+      run: choco install rcedit -y
+      shell: pwsh
 
     - name: Set resources on files
       run: |
-        $Env:Path += ";$Env:USERPROFILE\AppData\Roaming\npm"
         $dir = ${{ inputs.directory-path }}
         $comment = ${{ inputs.comment }}
         $flag = ${{ inputs.set-icon }}

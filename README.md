@@ -65,14 +65,14 @@ on:
 
 jobs:
   set-resources:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Set resources with rcedit
-        uses: Bioblaze/rcedit-action@main
+        uses: Bioblaze/rcedit-action@v1a
         with:
           directory-path: './path/to/exe/files'
           comment: 'This is a comment'
