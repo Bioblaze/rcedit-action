@@ -72,20 +72,21 @@ runs:
         foreach ($file in $targetFiles) {
             $rceditArgs = @()
 
-            if ($null -ne $comment) { $rceditArgs += "--set-version-string", "Comments", "$comment" }
-            if ($null -ne $companyName) { $rceditArgs += "--set-version-string", "CompanyName", "$companyName" }
-            if ($null -ne $legalCopyright) { $rceditArgs += "--set-version-string", "LegalCopyright", "$legalCopyright" }
-            if ($null -ne $legalTrademarks) { $rceditArgs += "--set-version-string", "LegalTrademarks", "$legalTrademarks" }
+            if (![String]::IsNullOrEmpty($comment)) { $rceditArgs += "--set-version-string", "Comments", "$comment" }
+            if (![String]::IsNullOrEmpty($companyName)) { $rceditArgs += "--set-version-string", "CompanyName", "$companyName" }
+            if (![String]::IsNullOrEmpty($legalCopyright)) { $rceditArgs += "--set-version-string", "LegalCopyright", "$legalCopyright" }
+            if (![String]::IsNullOrEmpty($legalTrademarks)) { $rceditArgs += "--set-version-string", "LegalTrademarks", "$legalTrademarks" }
 
             if ($file.Name -eq $specificFile) {
                 if ($flag -eq "true") { $rceditArgs += "--set-icon", "$icoFile" }
-                if ($null -ne $fileDescription) { $rceditArgs += "--set-version-string", "FileDescription", "$fileDescription" }
-                if ($null -ne $fileVersion) { $rceditArgs += "--set-version-string", "FileVersion", "$fileVersion" }
-                if ($null -ne $productName) { $rceditArgs += "--set-version-string", "ProductName", "$productName" }
-                if ($null -ne $productVersion) { $rceditArgs += "--set-version-string", "ProductVersion", "$productVersion" }
+                if (![String]::IsNullOrEmpty($fileDescription)) { $rceditArgs += "--set-version-string", "FileDescription", "$fileDescription" }
+                if (![String]::IsNullOrEmpty($fileVersion)) { $rceditArgs += "--set-version-string", "FileVersion", "$fileVersion" }
+                if (![String]::IsNullOrEmpty($productName)) { $rceditArgs += "--set-version-string", "ProductName", "$productName" }
+                if (![String]::IsNullOrEmpty($productVersion)) { $rceditArgs += "--set-version-string", "ProductVersion", "$productVersion" }
             }
 
             & rcedit $file.FullName $rceditArgs
         }
+
 
       shell: pwsh
