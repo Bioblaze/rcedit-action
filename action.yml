@@ -70,17 +70,22 @@ runs:
         $targetFiles = Get-ChildItem -Path $dir -Recurse -File | Where-Object { $_.Extension -eq ".exe" -or $_.Extension -eq ".dll" }
 
         foreach ($file in $targetFiles) {
-            if ($null -ne $comment) { & rcedit $file.FullName --set-version-string "Comments" "$comment" }
-            if ($null -ne $companyName) { & rcedit $file.FullName --set-version-string "CompanyName" "$companyName" }
-            if ($null -ne $legalCopyright) { & rcedit $file.FullName --set-version-string "LegalCopyright" "$legalCopyright" }
-            if ($null -ne $legalTrademarks) { & rcedit $file.FullName --set-version-string "LegalTrademarks" "$legalTrademarks" }
+            $rceditArgs = @()
+
+            if ($null -ne $comment) { $rceditArgs += "--set-version-string", "Comments", "$comment" }
+            if ($null -ne $companyName) { $rceditArgs += "--set-version-string", "CompanyName", "$companyName" }
+            if ($null -ne $legalCopyright) { $rceditArgs += "--set-version-string", "LegalCopyright", "$legalCopyright" }
+            if ($null -ne $legalTrademarks) { $rceditArgs += "--set-version-string", "LegalTrademarks", "$legalTrademarks" }
 
             if ($file.Name -eq $specificFile) {
-                if ($flag -eq "true") { & rcedit $file.FullName --set-icon "$icoFile" }
-                if ($null -ne $fileDescription) { & rcedit $file.FullName --set-version-string "FileDescription" "$fileDescription" }
-                if ($null -ne $fileVersion) { & rcedit $file.FullName --set-version-string "FileVersion" "$fileVersion" }
-                if ($null -ne $productName) { & rcedit $file.FullName --set-version-string "ProductName" "$productName" }
-                if ($null -ne $productVersion) { & rcedit $file.FullName --set-version-string "ProductVersion" "$productVersion" }
+                if ($flag -eq "true") { $rceditArgs += "--set-icon", "$icoFile" }
+                if ($null -ne $fileDescription) { $rceditArgs += "--set-version-string", "FileDescription", "$fileDescription" }
+                if ($null -ne $fileVersion) { $rceditArgs += "--set-version-string", "FileVersion", "$fileVersion" }
+                if ($null -ne $productName) { $rceditArgs += "--set-version-string", "ProductName", "$productName" }
+                if ($null -ne $productVersion) { $rceditArgs += "--set-version-string", "ProductVersion", "$productVersion" }
             }
+
+            & rcedit $file.FullName $rceditArgs
         }
+
       shell: pwsh
