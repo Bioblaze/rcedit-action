@@ -1,0 +1,89 @@
+name: 'Set Resources on Files with rcedit'
+description: 'Use rcedit to set resources on exe files'
+author: 'Bioblaze Payne(Randolph William Aarseth II)'
+branding:
+  color: blue
+  icon: edit
+
+inputs:
+  directory-path:
+    description: 'Path to the directory containing the exe files'
+    required: true
+  comment:
+    description: 'Comment to set on the exe files'
+    required: false
+  set-icon:
+    description: 'Whether to set the icon of a specific exe file'
+    required: false
+    default: 'false'
+  exe-file-name:
+    description: 'Name of the exe file whose icon should be set'
+    required: false
+  ico-file-path:
+    description: 'Path to the icon file'
+    required: false
+  company-name:
+    description: 'Company name to set on the exe files'
+    required: false
+  file-description:
+    description: 'File description to set on the exe files'
+    required: false
+  file-version:
+    description: 'File version to set on the exe files'
+    required: false
+  legal-copyright:
+    description: 'Legal copyright to set on the exe files'
+    required: false
+  legal-trademarks:
+    description: 'Legal trademarks to set on the exe files'
+    required: false
+  product-name:
+    description: 'Product name to set on the exe files'
+    required: false
+  product-version:
+    description: 'Product version to set on the exe files'
+    required: false
+  
+runs:
+  using: "composite"
+  steps:
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Install rcedit
+      run: |
+        npm install --global --production windows-build-tools
+        npm install -g rcedit
+      shell: bash
+
+    - name: Set resources on files
+      run: |
+        $Env:Path += ";$Env:USERPROFILE\AppData\Roaming\npm"
+        $dir = ${{ inputs.directory-path }}
+        $comment = ${{ inputs.comment }}
+        $flag = ${{ inputs.set-icon }}
+        $exeFile = ${{ inputs.exe-file-name }}
+        $icoFile = ${{ inputs.ico-file-path }}
+        $companyName = ${{ inputs.company-name }}
+        $fileDescription = ${{ inputs.file-description }}
+        $fileVersion = ${{ inputs.file-version }}
+        $legalCopyright = ${{ inputs.legal-copyright }}
+        $legalTrademarks = ${{ inputs.legal-trademarks }}
+        $productName = ${{ inputs.product-name }}
+        $productVersion = ${{ inputs.product-version }}
+
+        Get-ChildItem -Path $dir -Recurse -File | Where-Object { $_.Extension -eq ".exe" } | ForEach-Object {
+            if ($null -ne $comment) { rcedit $_.FullName --set-version-string "Comments" $comment }
+            if ($flag -eq "true" -and $_.Name -eq $exeFile) { rcedit $_.FullName --set-icon $icoFile }
+            if ($null -ne $companyName) { rcedit $_.FullName --set-version-string "CompanyName" $companyName }
+            if ($null -ne $fileDescription) { rcedit $_.FullName --set-version-string "FileDescription" $fileDescription }
+            if ($null -ne $fileVersion) { rcedit $_.FullName --set-version-string "FileVersion" $fileVersion }
+            if ($null -ne $legalCopyright) { rcedit $_.FullName --set-version-string "LegalCopyright" $legalCopyright }
+            if ($null -ne $legalTrademarks) { rcedit $_.FullName --set-version-string "LegalTrademarks" $legalTrademarks }
+            if ($null -ne $productName) { rcedit $_.FullName --set-version-string "ProductName" $productName }
+            if ($null -ne $productVersion) { rcedit $_.FullName --set-version-string "ProductVersion" $productVersion }
+        }
+      shell: pwsh
