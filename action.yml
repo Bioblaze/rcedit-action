@@ -1,5 +1,5 @@
 name: 'Set Resources on Files with rcedit'
-description: 'Use rcedit to set resources on exe files'
+description: 'Use rcedit to set resources on exe or dll files'
 author: 'Bioblaze Payne(Randolph William Aarseth II)'
 branding:
   color: blue
@@ -7,41 +7,45 @@ branding:
 
 inputs:
   directory-path:
-    description: 'Path to the directory containing the exe files'
+    description: 'Path to the directory containing the files'
     required: true
+  file-types:
+    description: 'Types of the files to be processed (comma-separated, without dots)'
+    required: true
+    default: 'exe,dll'
   comment:
-    description: 'Comment to set on the exe files'
+    description: 'Comment to set on the files'
     required: false
   set-icon:
-    description: 'Whether to set the icon of a specific exe file'
+    description: 'Whether to set the icon of a specific file'
     required: false
     default: 'false'
   exe-file-name:
-    description: 'Name of the exe file whose icon should be set'
+    description: 'Name of the file whose icon should be set'
     required: false
   ico-file-path:
     description: 'Path to the icon file'
     required: false
   company-name:
-    description: 'Company name to set on the exe files'
+    description: 'Company name to set on the files'
     required: false
   file-description:
-    description: 'File description to set on the exe files'
+    description: 'File description to set on the files'
     required: false
   file-version:
-    description: 'File version to set on the exe files'
+    description: 'File version to set on the files'
     required: false
   legal-copyright:
-    description: 'Legal copyright to set on the exe files'
+    description: 'Legal copyright to set on the files'
     required: false
   legal-trademarks:
-    description: 'Legal trademarks to set on the exe files'
+    description: 'Legal trademarks to set on the files'
     required: false
   product-name:
-    description: 'Product name to set on the exe files'
+    description: 'Product name to set on the files'
     required: false
   product-version:
-    description: 'Product version to set on the exe files'
+    description: 'Product version to set on the files'
     required: false
 
 runs:
@@ -55,6 +59,11 @@ runs:
     - name: Set resources on files
       run: |
         $dir = "${{ inputs.directory-path }}"
+        $fileTypes = "${{ inputs.file-types }}" -split ','
+        if ($fileTypes.Count -eq 0) {
+          throw "At least one file type must be provided."
+        }
+
         $comment = "${{ inputs.comment }}"
         $flag = "${{ inputs.set-icon }}"
         $specificFile = "${{ inputs.exe-file-name }}"
@@ -67,7 +76,7 @@ runs:
         $productName = "${{ inputs.product-name }}"
         $productVersion = "${{ inputs.product-version }}"
 
-        $targetFiles = Get-ChildItem -Path $dir -Recurse -File | Where-Object { $_.Extension -eq ".exe" -or $_.Extension -eq ".dll" }
+        $targetFiles = Get-ChildItem -Path $dir -Recurse -File | Where-Object { $fileTypes -contains $_.Extension.Substring(1) }
 
         foreach ($file in $targetFiles) {
             $rceditArgs = @()
@@ -86,7 +95,4 @@ runs:
             }
 
             & rcedit $file.FullName $rceditArgs
-        }
-
-
-      shell: pwsh
+        shell: pwsh

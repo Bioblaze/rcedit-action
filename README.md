@@ -1,94 +1,56 @@
 # Set Resources on Files with rcedit
 
-This GitHub Action uses rcedit to set resources on executable files.
-
-## Inputs
-
-### `directory-path`
-
-**Required** The path to the directory containing the executable files.
-
-### `comment`
-
-The comment to set on the executable files. If not provided, no comment will be set.
-
-### `set-icon`
-
-Flag indicating whether to set the icon of a specific executable file. Defaults to `false`.
-
-### `exe-file-name`
-
-The name of the executable file whose icon should be set. This input is used only if `set-icon` is `true`.
-
-### `ico-file-path`
-
-The path to the icon file. This input is used only if `set-icon` is `true`.
-
-### `company-name`
-
-The company name to set on the executable files. If not provided, no company name will be set.
-
-### `file-description`
-
-The file description to set on the executable files. If not provided, no file description will be set.
-
-### `file-version`
-
-The file version to set on the executable files. If not provided, no file version will be set.
-
-### `legal-copyright`
-
-The legal copyright to set on the executable files. If not provided, no legal copyright will be set.
-
-### `legal-trademarks`
-
-The legal trademarks to set on the executable files. If not provided, no legal trademarks will be set.
-
-### `product-name`
-
-The product name to set on the executable files. If not provided, no product name will be set.
-
-### `product-version`
-
-The product version to set on the executable files. If not provided, no product version will be set.
+## Description
+This GitHub Action uses rcedit to set resources on exe or dll files.
 
 ## Usage
 
-Here's an example of how you might use this action in your workflow:
+### Inputs
+
+| Input | Description | Required | Default |
+|-------|-------------|----------|---------|
+| `directory-path` | Path to the directory containing the files. | true | - |
+| `file-types` | Types of the files to be processed (comma-separated, without dots). | true | 'exe,dll' |
+| `comment` | Comment to set on the files. | false | - |
+| `set-icon` | Whether to set the icon of a specific file. | false | 'false' |
+| `exe-file-name` | Name of the file whose icon should be set. | false | - |
+| `ico-file-path` | Path to the icon file. | false | - |
+| `company-name` | Company name to set on the files. | false | - |
+| `file-description` | File description to set on the files. | false | - |
+| `file-version` | File version to set on the files. | false | - |
+| `legal-copyright` | Legal copyright to set on the files. | false | - |
+| `legal-trademarks` | Legal trademarks to set on the files. | false | - |
+| `product-name` | Product name to set on the files. | false | - |
+| `product-version` | Product version to set on the files. | false | - |
+
+### Example
+
+This GitHub Action can be used as follows in your workflows:
 
 ```yaml
-name: Set Resources
-
-on:
-  push:
-    branches: [ main ]
-
 jobs:
-  set-resources:
+  build:
     runs-on: windows-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set resources with rcedit
-        uses: Bioblaze/rcedit-action@v1a
+      - uses: actions/checkout@v2
+      
+      - name: Set resources on files with rcedit
+        uses: ./ # Uses an action in the root directory
         with:
-          directory-path: './path/to/exe/files'
-          comment: 'This is a comment'
+          directory-path: './dist'
+          file-types: 'exe,dll'
+          comment: 'My custom comment'
           set-icon: 'true'
-          exe-file-name: 'my-executable.exe'
-          ico-file-path: './path/to/icon.ico'
+          exe-file-name: 'myExecutable.exe'
+          ico-file-path: './icon.ico'
           company-name: 'My Company'
-          file-description: 'This is a file description'
+          file-description: 'My file description'
           file-version: '1.0.0'
-          legal-copyright: '2023 My Company'
-          legal-trademarks: 'My Company Trademark'
+          legal-copyright: 'Copyright 2023'
+          legal-trademarks: 'My Trademark'
           product-name: 'My Product'
           product-version: '1.0.0'
 ```
 
 ## Author
-
-Bioblaze Payne
-Randolph William Aarseth II
+This Action was created by [Bioblaze Payne(Randolph William Aarseth II)](https://github.com/Bioblaze).
