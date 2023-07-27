@@ -95,4 +95,4 @@ runs:
             }
 
             & rcedit $file.FullName $rceditArgs
-        shell: pwsh
+      shell: pwsh
